@@ -37,7 +37,7 @@ Resources:
       CodeUri: modules/clients/target/clients.jar
       Environment:
         Variables:
-          TABLE_NAME: !Ref ClientsTable
+          TABLE_NAME: clients
       Events:
         ListClients:
           Type: Api
