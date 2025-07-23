@@ -12,6 +12,7 @@
   <modules>
     <module>modules/health</module>
     <module>modules/clients</module>
+    <module>modules/drivers</module>
     <!-- más módulos en el futuro: clients, drivers, routes -->
   </modules>
 
