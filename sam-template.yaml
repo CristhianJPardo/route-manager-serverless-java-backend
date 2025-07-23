@@ -1,51 +1,39 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: >-
+Description: >
   Router Manager Backend con microservicios Lambda en Java y SupaBase
 
-#############################################
-# Parámetros para SupaBase y tablas
-#############################################
 Parameters:
   SupabaseUrl:
     Type: String
-    Description: URL de tu proyecto SupaBase (p.ej. https://xyz.supabase.co)
+    Description: URL de tu proyecto SupaBase
   SupabaseApiKey:
     Type: String
     NoEcho: true
-    Description: API Key de SupaBase (service_role o anon)
+    Description: API Key de SupaBase
   DBHost:
     Type: String
-    Description: Host de la base de datos Postgres (p.ej. db.xyz.supabase.co)
+    Description: Host de la base de datos
   DBName:
     Type: String
     Default: postgres
-    Description: Nombre de la base de datos en SupaBase
   DBUser:
     Type: String
     Default: postgres
-    Description: Usuario de la base de datos
   DBPassword:
     Type: String
     NoEcho: true
-    Description: Contraseña de la base de datos
 
   ClientsTable:
     Type: String
     Default: clients
-    Description: Nombre de la tabla de clientes
   DriversTable:
     Type: String
     Default: drivers
-    Description: Nombre de la tabla de conductores
   RoutesTable:
     Type: String
     Default: routes
-    Description: Nombre de la tabla de rutas
 
-#############################################
-# Globals: runtime y configuración común
-#############################################
 Globals:
   Function:
     Runtime: java11
@@ -63,14 +51,13 @@ Globals:
 Resources:
 
   #########################################
-  # CRUD CLIENTS
+  # CLIENTS
   #########################################
-
   CreateClientFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: helloworld.CreateClientHandler
-      CodeUri: target/create-client.jar
+      Handler: co.lacorporacionun.clients.CreateClientHandler
+      CodeUri: modules/clients/target/clients.jar
       Events:
         ApiCreateClient:
           Type: Api
@@ -84,8 +71,8 @@ Resources:
   GetClientsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: helloworld.GetClientsHandler
-      CodeUri: target/get-clients.jar
+      Handler: co.lacorporacionun.clients.GetClientsHandler
+      CodeUri: modules/clients/target/clients.jar
       Events:
         ApiGetClients:
           Type: Api
@@ -99,8 +86,8 @@ Resources:
   GetClientByIdFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: helloworld.GetClientByIdHandler
-      CodeUri: target/get-client-by-id.jar
+      Handler: co.lacorporacionun.clients.GetClientByIdHandler
+      CodeUri: modules/clients/target/clients.jar
       Events:
         ApiGetClientById:
           Type: Api
@@ -114,8 +101,8 @@ Resources:
   UpdateClientByIdFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: helloworld.UpdateClientByIdHandler
-      CodeUri: target/update-client.jar
+      Handler: co.lacorporacionun.clients.UpdateClientByIdHandler
+      CodeUri: modules/clients/target/clients.jar
       Events:
         ApiUpdateClientById:
           Type: Api
@@ -129,8 +116,8 @@ Resources:
   DeleteClientByIdFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: helloworld.DeleteClientByIdHandler
-      CodeUri: target/delete-client.jar
+      Handler: co.lacorporacionun.clients.DeleteClientByIdHandler
+      CodeUri: modules/clients/target/clients.jar
       Events:
         ApiDeleteClientById:
           Type: Api
@@ -142,14 +129,13 @@ Resources:
           TABLE_NAME: !Ref ClientsTable
 
   #########################################
-  # CRUD DRIVERS
+  # DRIVERS
   #########################################
-
   CreateDriverFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: helloworld.CreateDriverHandler
-      CodeUri: target/create-driver.jar
+      Handler: co.lacorporacionun.drivers.CreateDriverHandler
+      CodeUri: modules/drivers/target/drivers.jar
       Events:
         ApiCreateDriver:
           Type: Api
@@ -163,8 +149,8 @@ Resources:
   GetAllDriversFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: helloworld.GetAllDriversHandler
-      CodeUri: target/get-all-drivers.jar
+      Handler: co.lacorporacionun.drivers.GetAllDriversHandler
+      CodeUri: modules/drivers/target/drivers.jar
       Events:
         ApiGetAllDrivers:
           Type: Api
@@ -178,8 +164,8 @@ Resources:
   UpdateDriverFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: helloworld.UpdateDriverHandler
-      CodeUri: target/update-driver.jar
+      Handler: co.lacorporacionun.drivers.UpdateDriverHandler
+      CodeUri: modules/drivers/target/drivers.jar
       Events:
         ApiUpdateDriver:
           Type: Api
@@ -193,8 +179,8 @@ Resources:
   DeleteDriverFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: helloworld.DeleteDriverHandler
-      CodeUri: target/delete-driver.jar
+      Handler: co.lacorporacionun.drivers.DeleteDriverHandler
+      CodeUri: modules/drivers/target/drivers.jar
       Events:
         ApiDeleteDriver:
           Type: Api
@@ -206,42 +192,13 @@ Resources:
           TABLE_NAME: !Ref DriversTable
 
   #########################################
-  # AUTH (LOGIN / REGISTER)
+  # ROUTES
   #########################################
-
-  RegisterManagerFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: helloworld.RegisterManagerHandler
-      CodeUri: target/register-manager.jar
-      Events:
-        ApiRegister:
-          Type: Api
-          Properties:
-            Path: /auth/register
-            Method: post
-
-  LoginFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: helloworld.LoginHandler
-      CodeUri: target/login.jar
-      Events:
-        ApiLogin:
-          Type: Api
-          Properties:
-            Path: /auth/login
-            Method: post
-
-  #########################################
-  # ROUTES (CREAR SOLICITUD)
-  #########################################
-
   CreateRouteFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: helloworld.CreateRouteHandler
-      CodeUri: target/create-route.jar
+      Handler: co.lacoporporacionun.routes.CreateRouteHandler
+      CodeUri: modules/routes/target/routes.jar
       Events:
         ApiCreateRoute:
           Type: Api
@@ -250,4 +207,24 @@ Resources:
             Method: post
       Environment:
         Variables:
-          ROUTES_TABLE: !Ref RoutesTable
+          TABLE_NAME: !Ref RoutesTable
+
+  #########################################
+  # HEALTH
+  #########################################
+  HealthCheckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: co.lacorporacionun.health.HealthCheckHandler
+      CodeUri: modules/health/target/health.jar
+      Events:
+        ApiPing:
+          Type: Api
+          Properties:
+            Path: /ping
+            Method: get
+
+Outputs:
+  BaseApiUrl:
+    Description: URL base de la API Gateway
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
