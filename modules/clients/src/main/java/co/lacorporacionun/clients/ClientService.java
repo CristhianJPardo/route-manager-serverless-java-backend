@@ -5,16 +5,16 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.postgresql.ds.PGSimpleDataSource;
 
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class ClientService {
-    private static final String JDBC_URL;
+    private static final String JDBC_URL_BASE;
     private static final String DB_USER;
     private static final String DB_PASSWORD;
     private final ObjectMapper mapper;
@@ -23,11 +23,10 @@ public class ClientService {
         String host = System.getenv("DB_HOST");
         String port = System.getenv("DB_PORT");
         String name = System.getenv("DB_NAME");
-        // AÑADIMOS sslmode=require para conectar con SupaBase
-        JDBC_URL = String.format("jdbc:postgresql://%s:%s/%s?sslmode=require", host, port, name);
+        JDBC_URL_BASE = String.format("jdbc:postgresql://%s:%s/%s", host, port, name);
         DB_USER = System.getenv("DB_USER");
         DB_PASSWORD = System.getenv("DB_PASSWORD");
-        System.out.println("[ClientService] Initialized with URL=" + JDBC_URL + " and user=" + DB_USER);
+        System.out.println("[ClientService] Initialized with base URL=" + JDBC_URL_BASE + " user=" + DB_USER);
     }
 
     public ClientService() {
@@ -38,12 +37,13 @@ public class ClientService {
     }
 
     private Connection getConnection() throws SQLException {
-        System.out.println("[ClientService] Opening DB connection");
-        PGSimpleDataSource ds = new PGSimpleDataSource();
-        ds.setUrl(JDBC_URL);
-        ds.setUser(DB_USER);
-        ds.setPassword(DB_PASSWORD);
-        return ds.getConnection();
+        System.out.println("[ClientService] Opening DB connection with SSL");
+        Properties props = new Properties();
+        props.setProperty("user", DB_USER);
+        props.setProperty("password", DB_PASSWORD);
+        props.setProperty("ssl", "true");
+        props.setProperty("sslmode", "require");
+        return DriverManager.getConnection(JDBC_URL_BASE, props);
     }
 
     public String listClients() {
