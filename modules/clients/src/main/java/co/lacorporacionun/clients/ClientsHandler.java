@@ -15,10 +15,10 @@ public class ClientsHandler implements RequestHandler<APIGatewayProxyRequestEven
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent req, Context ctx) {
         var log = ctx.getLogger();
         String method = req.getHttpMethod();
-        String path = req.getPath();
+        String path = req.getResource();
         Map<String, String> pathParams = req.getPathParameters();
 
-        log.log("[ClientsHandler] Received request: method=" + method + ", path=" + path);
+        log.log("[ClientsHandler] Received request method=" + method + ", resource=" + path);
         try {
             APIGatewayProxyResponseEvent response;
             switch (method) {
@@ -40,24 +40,24 @@ public class ClientsHandler implements RequestHandler<APIGatewayProxyRequestEven
                     response = new APIGatewayProxyResponseEvent().withStatusCode(204);
                     break;
                 default:
-                    response = new APIGatewayProxyResponseEvent().withStatusCode(405).withBody("{\"error\":\"Method Not Allowed\"}");
+                    response = new APIGatewayProxyResponseEvent().withStatusCode(405)
+                        .withBody("{\"error\":\"Method Not Allowed\"}");
             }
-            log.log("[ClientsHandler] Responding with status=" + response.getStatusCode());
+            log.log("[ClientsHandler] Responding status=" + response.getStatusCode());
             return response;
         } catch (Exception e) {
-            log.log("[ClientsHandler] Exception: " + e.getMessage());
-            for (var ste : e.getStackTrace()) {
-                log.log(ste.toString());
-            }
-            return new APIGatewayProxyResponseEvent().withStatusCode(500)
-                .withBody("{\"error\":\"" + e.getMessage() + "\"}");
+            log.log("[ClientsHandler] Exception: " + e);
+            for (var ste : e.getStackTrace()) log.log(ste.toString());
+            return new APIGatewayProxyResponseEvent()
+                .withStatusCode(500)
+                .withBody("{\"error\":\"" + e.getMessage() +"\"}");
         }
     }
 
     private APIGatewayProxyResponseEvent buildResponse(int code, String body) {
         return new APIGatewayProxyResponseEvent()
             .withStatusCode(code)
-            .withHeaders(Map.of("Content-Type", "application/json"))
+            .withHeaders(Map.of("Content-Type","application/json"))
             .withBody(body);
     }
 }
