@@ -50,164 +50,164 @@ Globals:
 
 Resources:
 
-  #########################################
-  # CLIENTS
-  #########################################
-  CreateClientFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: co.lacorporacionun.clients.CreateClientHandler
-      CodeUri: modules/clients/target/clients.jar
-      Events:
-        ApiCreateClient:
-          Type: Api
-          Properties:
-            Path: /api/v1/clients
-            Method: post
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref ClientsTable
+  # #########################################
+  # # CLIENTS
+  # #########################################
+  # CreateClientFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     Handler: co.lacorporacionun.clients.CreateClientHandler
+  #     CodeUri: modules/clients/target/clients.jar
+  #     Events:
+  #       ApiCreateClient:
+  #         Type: Api
+  #         Properties:
+  #           Path: /api/v1/clients
+  #           Method: post
+  #     Environment:
+  #       Variables:
+  #         TABLE_NAME: !Ref ClientsTable
 
-  GetClientsFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: co.lacorporacionun.clients.GetClientsHandler
-      CodeUri: modules/clients/target/clients.jar
-      Events:
-        ApiGetClients:
-          Type: Api
-          Properties:
-            Path: /api/v1/clients
-            Method: get
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref ClientsTable
+  # GetClientsFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     Handler: co.lacorporacionun.clients.GetClientsHandler
+  #     CodeUri: modules/clients/target/clients.jar
+  #     Events:
+  #       ApiGetClients:
+  #         Type: Api
+  #         Properties:
+  #           Path: /api/v1/clients
+  #           Method: get
+  #     Environment:
+  #       Variables:
+  #         TABLE_NAME: !Ref ClientsTable
 
-  GetClientByIdFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: co.lacorporacionun.clients.GetClientByIdHandler
-      CodeUri: modules/clients/target/clients.jar
-      Events:
-        ApiGetClientById:
-          Type: Api
-          Properties:
-            Path: /api/v1/clients/{id}
-            Method: get
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref ClientsTable
+  # GetClientByIdFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     Handler: co.lacorporacionun.clients.GetClientByIdHandler
+  #     CodeUri: modules/clients/target/clients.jar
+  #     Events:
+  #       ApiGetClientById:
+  #         Type: Api
+  #         Properties:
+  #           Path: /api/v1/clients/{id}
+  #           Method: get
+  #     Environment:
+  #       Variables:
+  #         TABLE_NAME: !Ref ClientsTable
 
-  UpdateClientByIdFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: co.lacorporacionun.clients.UpdateClientByIdHandler
-      CodeUri: modules/clients/target/clients.jar
-      Events:
-        ApiUpdateClientById:
-          Type: Api
-          Properties:
-            Path: /api/v1/clients/{id}
-            Method: put
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref ClientsTable
+  # UpdateClientByIdFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     Handler: co.lacorporacionun.clients.UpdateClientByIdHandler
+  #     CodeUri: modules/clients/target/clients.jar
+  #     Events:
+  #       ApiUpdateClientById:
+  #         Type: Api
+  #         Properties:
+  #           Path: /api/v1/clients/{id}
+  #           Method: put
+  #     Environment:
+  #       Variables:
+  #         TABLE_NAME: !Ref ClientsTable
 
-  DeleteClientByIdFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: co.lacorporacionun.clients.DeleteClientByIdHandler
-      CodeUri: modules/clients/target/clients.jar
-      Events:
-        ApiDeleteClientById:
-          Type: Api
-          Properties:
-            Path: /api/v1/clients/{id}
-            Method: delete
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref ClientsTable
+  # DeleteClientByIdFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     Handler: co.lacorporacionun.clients.DeleteClientByIdHandler
+  #     CodeUri: modules/clients/target/clients.jar
+  #     Events:
+  #       ApiDeleteClientById:
+  #         Type: Api
+  #         Properties:
+  #           Path: /api/v1/clients/{id}
+  #           Method: delete
+  #     Environment:
+  #       Variables:
+  #         TABLE_NAME: !Ref ClientsTable
 
-  #########################################
-  # DRIVERS
-  #########################################
-  CreateDriverFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: co.lacorporacionun.drivers.CreateDriverHandler
-      CodeUri: modules/drivers/target/drivers.jar
-      Events:
-        ApiCreateDriver:
-          Type: Api
-          Properties:
-            Path: /api/v1/drivers
-            Method: post
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref DriversTable
+  # #########################################
+  # # DRIVERS
+  # #########################################
+  # CreateDriverFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     Handler: co.lacorporacionun.drivers.CreateDriverHandler
+  #     CodeUri: modules/drivers/target/drivers.jar
+  #     Events:
+  #       ApiCreateDriver:
+  #         Type: Api
+  #         Properties:
+  #           Path: /api/v1/drivers
+  #           Method: post
+  #     Environment:
+  #       Variables:
+  #         TABLE_NAME: !Ref DriversTable
 
-  GetAllDriversFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: co.lacorporacionun.drivers.GetAllDriversHandler
-      CodeUri: modules/drivers/target/drivers.jar
-      Events:
-        ApiGetAllDrivers:
-          Type: Api
-          Properties:
-            Path: /api/v1/drivers
-            Method: get
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref DriversTable
+  # GetAllDriversFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     Handler: co.lacorporacionun.drivers.GetAllDriversHandler
+  #     CodeUri: modules/drivers/target/drivers.jar
+  #     Events:
+  #       ApiGetAllDrivers:
+  #         Type: Api
+  #         Properties:
+  #           Path: /api/v1/drivers
+  #           Method: get
+  #     Environment:
+  #       Variables:
+  #         TABLE_NAME: !Ref DriversTable
 
-  UpdateDriverFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: co.lacorporacionun.drivers.UpdateDriverHandler
-      CodeUri: modules/drivers/target/drivers.jar
-      Events:
-        ApiUpdateDriver:
-          Type: Api
-          Properties:
-            Path: /api/v1/drivers/{id}
-            Method: put
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref DriversTable
+  # UpdateDriverFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     Handler: co.lacorporacionun.drivers.UpdateDriverHandler
+  #     CodeUri: modules/drivers/target/drivers.jar
+  #     Events:
+  #       ApiUpdateDriver:
+  #         Type: Api
+  #         Properties:
+  #           Path: /api/v1/drivers/{id}
+  #           Method: put
+  #     Environment:
+  #       Variables:
+  #         TABLE_NAME: !Ref DriversTable
 
-  DeleteDriverFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: co.lacorporacionun.drivers.DeleteDriverHandler
-      CodeUri: modules/drivers/target/drivers.jar
-      Events:
-        ApiDeleteDriver:
-          Type: Api
-          Properties:
-            Path: /api/v1/drivers/{id}
-            Method: delete
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref DriversTable
+  # DeleteDriverFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     Handler: co.lacorporacionun.drivers.DeleteDriverHandler
+  #     CodeUri: modules/drivers/target/drivers.jar
+  #     Events:
+  #       ApiDeleteDriver:
+  #         Type: Api
+  #         Properties:
+  #           Path: /api/v1/drivers/{id}
+  #           Method: delete
+  #     Environment:
+  #       Variables:
+  #         TABLE_NAME: !Ref DriversTable
 
-  #########################################
-  # ROUTES
-  #########################################
-  CreateRouteFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: co.lacoporporacionun.routes.CreateRouteHandler
-      CodeUri: modules/routes/target/routes.jar
-      Events:
-        ApiCreateRoute:
-          Type: Api
-          Properties:
-            Path: /api/v1/routes
-            Method: post
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref RoutesTable
+  # #########################################
+  # # ROUTES
+  # #########################################
+  # CreateRouteFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     Handler: co.lacoporporacionun.routes.CreateRouteHandler
+  #     CodeUri: modules/routes/target/routes.jar
+  #     Events:
+  #       ApiCreateRoute:
+  #         Type: Api
+  #         Properties:
+  #           Path: /api/v1/routes
+  #           Method: post
+  #     Environment:
+  #       Variables:
+  #         TABLE_NAME: !Ref RoutesTable
 
   #########################################
   # HEALTH
