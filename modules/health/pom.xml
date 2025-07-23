@@ -14,11 +14,6 @@
   <artifactId>health</artifactId>
   <packaging>jar</packaging>
 
-  <properties>
-    <!-- para que el jar final se llame sólo health.jar -->
-    <finalName>health</finalName>
-  </properties>
-
   <dependencies>
     <!-- Core Lambda API -->
     <dependency>
@@ -35,6 +30,9 @@
   </dependencies>
 
   <build>
+    <!-- Hace que el JAR final se llame health.jar -->
+    <finalName>health</finalName>
+
     <plugins>
       <!-- Shade plugin para generar fat‑jar -->
       <plugin>
@@ -44,13 +42,13 @@
         <executions>
           <execution>
             <phase>package</phase>
-            <goals><goal>shade</goal></goals>
+            <goals>
+              <goal>shade</goal>
+            </goals>
             <configuration>
               <createDependencyReducedPom>false</createDependencyReducedPom>
               <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <!-- No usamos mainClass aquí, Lambda ignora el Main-Class del manifest -->
-                </transformer>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"/>
               </transformers>
             </configuration>
           </execution>
