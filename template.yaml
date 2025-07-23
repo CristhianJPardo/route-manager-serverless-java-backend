@@ -27,83 +27,46 @@ Globals:
 
 Resources:
 
-  # #########################################
-  # # CLIENTS
-  # #########################################
-  # CreateClientFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     Handler: co.lacorporacionun.clients.CreateClientHandler
-  #     CodeUri: modules/clients/target/clients.jar
-  #     Events:
-  #       ApiCreateClient:
-  #         Type: Api
-  #         Properties:
-  #           Path: /api/v1/clients
-  #           Method: post
-  #     Environment:
-  #       Variables:
-  #         TABLE_NAME: !Ref ClientsTable
-
-  # GetClientsFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     Handler: co.lacorporacionun.clients.GetClientsHandler
-  #     CodeUri: modules/clients/target/clients.jar
-  #     Events:
-  #       ApiGetClients:
-  #         Type: Api
-  #         Properties:
-  #           Path: /api/v1/clients
-  #           Method: get
-  #     Environment:
-  #       Variables:
-  #         TABLE_NAME: !Ref ClientsTable
-
-  # GetClientByIdFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     Handler: co.lacorporacionun.clients.GetClientByIdHandler
-  #     CodeUri: modules/clients/target/clients.jar
-  #     Events:
-  #       ApiGetClientById:
-  #         Type: Api
-  #         Properties:
-  #           Path: /api/v1/clients/{id}
-  #           Method: get
-  #     Environment:
-  #       Variables:
-  #         TABLE_NAME: !Ref ClientsTable
-
-  # UpdateClientByIdFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     Handler: co.lacorporacionun.clients.UpdateClientByIdHandler
-  #     CodeUri: modules/clients/target/clients.jar
-  #     Events:
-  #       ApiUpdateClientById:
-  #         Type: Api
-  #         Properties:
-  #           Path: /api/v1/clients/{id}
-  #           Method: put
-  #     Environment:
-  #       Variables:
-  #         TABLE_NAME: !Ref ClientsTable
-
-  # DeleteClientByIdFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     Handler: co.lacorporacionun.clients.DeleteClientByIdHandler
-  #     CodeUri: modules/clients/target/clients.jar
-  #     Events:
-  #       ApiDeleteClientById:
-  #         Type: Api
-  #         Properties:
-  #           Path: /api/v1/clients/{id}
-  #           Method: delete
-  #     Environment:
-  #       Variables:
-  #         TABLE_NAME: !Ref ClientsTable
+  #########################################
+  # CLIENTS
+  #########################################
+  #########################################
+  # CLIENTS – CRUD en una sola Lambda
+  #########################################
+  ClientsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: co.lacorporacionun.clients.ClientsHandler
+      CodeUri: modules/clients/target/clients.jar
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ClientsTable
+      Events:
+        ListClients:
+          Type: Api
+          Properties:
+            Path: /api/v1/clients
+            Method: get
+        CreateClient:
+          Type: Api
+          Properties:
+            Path: /api/v1/clients
+            Method: post
+        GetClientById:
+          Type: Api
+          Properties:
+            Path: /api/v1/clients/{id}
+            Method: get
+        UpdateClientById:
+          Type: Api
+          Properties:
+            Path: /api/v1/clients/{id}
+            Method: put
+        DeleteClientById:
+          Type: Api
+          Properties:
+            Path: /api/v1/clients/{id}
+            Method: delete
 
   # #########################################
   # # DRIVERS
