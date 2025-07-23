@@ -10,8 +10,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 
-public class HealthCheckHandler
-    implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+public class HealthCheckHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
     @Override
     public APIGatewayProxyResponseEvent handleRequest(
@@ -37,25 +36,28 @@ public class HealthCheckHandler
     }
 
     private APIGatewayProxyResponseEvent checkDatabase(Context ctx) throws Exception {
-        // Build JDBC URL from environment
-        String hostEnv = System.getenv("DB_HOST");
-        String url;
-        if (hostEnv.startsWith("jdbc:")) {
-            url = hostEnv;
-        } else {
-            String port = System.getenv("DB_PORT");
-            String db   = System.getenv("DB_NAME");
-            // ensure SSL
-            url = String.format(
-                "jdbc:postgresql://%s:%s/%s?sslmode=require",
-                hostEnv, port, db
-            );
-        }
+        String host = System.getenv("DB_HOST");
+        String port = System.getenv("DB_PORT");
+        String db   = System.getenv("DB_NAME");
         String user = System.getenv("DB_USER");
         String pass = System.getenv("DB_PASSWORD");
+        String url;
+        if (host.startsWith("jdbc:")) {
+            // Si DB_HOST ya es una URL JDBC, le agregamos credenciales si no existen
+            url = host;
+            if (!host.contains("user=") && !host.contains("password=")) {
+                url = String.format("%s&user=%s&password=%s", host, user, pass);
+            }
+        } else {
+            // Construir la URL completa con SSL y credenciales
+            url = String.format(
+                "jdbc:postgresql://%s:%s/%s?sslmode=require&user=%s&password=%s",
+                host, port, db, user, pass
+            );
+        }
         ctx.getLogger().log("[HealthCheckHandler] Checking DB with URL: " + url);
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = DriverManager.getConnection(url);
              Statement stmt = conn.createStatement()) {
             stmt.executeQuery("SELECT 1");
             return new APIGatewayProxyResponseEvent()
