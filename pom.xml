@@ -4,58 +4,19 @@
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.example</groupId>
-  <artifactId>hello-java-lambda</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <groupId>co.lacorporacionun</groupId>
+  <artifactId>route-manager-serverless-java-backend</artifactId>
+  <version>1.0.0</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>modules/health</module>
+    <!-- más módulos en el futuro: clients, drivers, routes -->
+  </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
   </properties>
-
-  <dependencies>
-    <!-- Core Lambda API -->
-    <dependency>
-      <groupId>com.amazonaws</groupId>
-      <artifactId>aws-lambda-java-core</artifactId>
-      <version>1.2.3</version>
-    </dependency>
-
-    <!-- Eventos de API Gateway para proxy integration -->
-    <dependency>
-      <groupId>com.amazonaws</groupId>
-      <artifactId>aws-lambda-java-events</artifactId>
-      <version>3.11.0</version>
-    </dependency>
-  </dependencies>
-
-  <build>
-    <plugins>
-      <!-- Generar un “fat-jar” con todas las clases para Lambda -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.4</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <createDependencyReducedPom>false</createDependencyReducedPom>
-              <!-- opcional: renombrar el jar final -->
-              <!--<finalName>${project.artifactId}-${project.version}-all</finalName>-->
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>helloworld.HelloWorldHandler</mainClass>
-                </transformer>
-              </transformers>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>
