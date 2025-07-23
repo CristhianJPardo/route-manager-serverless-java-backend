@@ -165,5 +165,5 @@ Resources:
             RestApiId: !Ref ApiGateway
 Outputs:
   BaseApiUrl:
-    Description: URL base de la API Gateway
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
