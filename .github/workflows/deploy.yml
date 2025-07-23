@@ -1,4 +1,4 @@
-name: Deploy Java Lambda to AWS
+name: Deploy Health Lambda to AWS
 
 on:
   workflow_dispatch:
@@ -8,15 +8,14 @@ on:
 
 jobs:
   deploy:
-    name: Build and Deploy
+    name: Build and Deploy Health
     runs-on: ubuntu-latest
 
-    # Cargamos aquí las repo-vars como env normales
     env:
-      AWS_REGION: ${{ vars.AWS_DEFAULT_REGION }}
-      S3_BUCKET:  ${{ vars.S3_BUCKET }}
+      AWS_REGION:   ${{ vars.AWS_DEFAULT_REGION }}
+      S3_BUCKET:    ${{ vars.S3_BUCKET }}
       SAM_TEMPLATE: ${{ vars.SAM_TEMPLATE }}
-      STACK_NAME: ${{ vars.STACK_NAME }}
+      STACK_NAME:   ${{ vars.STACK_NAME }}
 
     steps:
       - name: Checkout repo
@@ -44,16 +43,16 @@ jobs:
           sudo apt-get install -y python3-pip
           pip3 install aws-sam-cli
 
-      - name: Build with Maven (clean package + shade JAR)
-        run: mvn clean package
+      - name: Build health module
+        run: mvn clean package -pl modules/health --also-make
 
-      - name: Verify JAR contains handler class
+      - name: Verify health.jar contains handler class
         run: |
-          echo "🔍 Verificando HelloWorldHandler.class en el JAR…"
-          jar tf target/hello-java-lambda-1.0-SNAPSHOT.jar \
-            | grep -q "helloworld/HelloWorldHandler.class" \
+          echo "🔍 Verificando HealthCheckHandler.class en health.jar…"
+          jar tf modules/health/target/health.jar \
+            | grep -q "co/lacorporacionun/health/HealthCheckHandler.class" \
             && echo "✅ Clase encontrada" \
-            || (echo "❌ Clase no encontrada en el JAR" && exit 1)
+            || (echo "❌ Clase no encontrada en health.jar" && exit 1)
 
       - name: Package with SAM
         run: |
