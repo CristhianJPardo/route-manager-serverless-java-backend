@@ -54,7 +54,7 @@ jobs:
       - name: Verify HealthCheckHandler in the shaded JAR
         run: |
           echo "🔍 Verificando HealthCheckHandler.class en el JAR…"
-          jar tf modules/health/target/health-*.jar \
+          jar tf modules/health/target/health.jar \
             | grep -q "co/lacorporacionun/health/HealthCheckHandler.class" \
             && echo "✅ Clase encontrada" \
             || (echo "❌ Clase no encontrada en el JAR" && exit 1)
