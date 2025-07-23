@@ -35,9 +35,9 @@ Resources:
       Name: RouteManagerApi
       StageName: Prod
       Cors:
-        AllowOrigin: "*"
-        AllowHeaders: "Content-Type,Authorization"
-        AllowMethods: "OPTIONS,GET,POST,PUT,DELETE"
+        AllowOrigin: "'*'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
 
   #########################################
   # CLIENTS – CRUD en una sola Lambda
