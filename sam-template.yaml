@@ -1,0 +1,253 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+  Router Manager Backend con microservicios Lambda en Java y SupaBase
+
+#############################################
+# Parámetros para SupaBase y tablas
+#############################################
+Parameters:
+  SupabaseUrl:
+    Type: String
+    Description: URL de tu proyecto SupaBase (p.ej. https://xyz.supabase.co)
+  SupabaseApiKey:
+    Type: String
+    NoEcho: true
+    Description: API Key de SupaBase (service_role o anon)
+  DBHost:
+    Type: String
+    Description: Host de la base de datos Postgres (p.ej. db.xyz.supabase.co)
+  DBName:
+    Type: String
+    Default: postgres
+    Description: Nombre de la base de datos en SupaBase
+  DBUser:
+    Type: String
+    Default: postgres
+    Description: Usuario de la base de datos
+  DBPassword:
+    Type: String
+    NoEcho: true
+    Description: Contraseña de la base de datos
+
+  ClientsTable:
+    Type: String
+    Default: clients
+    Description: Nombre de la tabla de clientes
+  DriversTable:
+    Type: String
+    Default: drivers
+    Description: Nombre de la tabla de conductores
+  RoutesTable:
+    Type: String
+    Default: routes
+    Description: Nombre de la tabla de rutas
+
+#############################################
+# Globals: runtime y configuración común
+#############################################
+Globals:
+  Function:
+    Runtime: java11
+    Timeout: 10
+    MemorySize: 512
+    Environment:
+      Variables:
+        SUPABASE_URL: !Ref SupabaseUrl
+        SUPABASE_API_KEY: !Ref SupabaseApiKey
+        DB_HOST: !Ref DBHost
+        DB_NAME: !Ref DBName
+        DB_USER: !Ref DBUser
+        DB_PASSWORD: !Ref DBPassword
+
+Resources:
+
+  #########################################
+  # CRUD CLIENTS
+  #########################################
+
+  CreateClientFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: helloworld.CreateClientHandler
+      CodeUri: target/create-client.jar
+      Events:
+        ApiCreateClient:
+          Type: Api
+          Properties:
+            Path: /api/v1/clients
+            Method: post
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ClientsTable
+
+  GetClientsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: helloworld.GetClientsHandler
+      CodeUri: target/get-clients.jar
+      Events:
+        ApiGetClients:
+          Type: Api
+          Properties:
+            Path: /api/v1/clients
+            Method: get
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ClientsTable
+
+  GetClientByIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: helloworld.GetClientByIdHandler
+      CodeUri: target/get-client-by-id.jar
+      Events:
+        ApiGetClientById:
+          Type: Api
+          Properties:
+            Path: /api/v1/clients/{id}
+            Method: get
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ClientsTable
+
+  UpdateClientByIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: helloworld.UpdateClientByIdHandler
+      CodeUri: target/update-client.jar
+      Events:
+        ApiUpdateClientById:
+          Type: Api
+          Properties:
+            Path: /api/v1/clients/{id}
+            Method: put
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ClientsTable
+
+  DeleteClientByIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: helloworld.DeleteClientByIdHandler
+      CodeUri: target/delete-client.jar
+      Events:
+        ApiDeleteClientById:
+          Type: Api
+          Properties:
+            Path: /api/v1/clients/{id}
+            Method: delete
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ClientsTable
+
+  #########################################
+  # CRUD DRIVERS
+  #########################################
+
+  CreateDriverFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: helloworld.CreateDriverHandler
+      CodeUri: target/create-driver.jar
+      Events:
+        ApiCreateDriver:
+          Type: Api
+          Properties:
+            Path: /api/v1/drivers
+            Method: post
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref DriversTable
+
+  GetAllDriversFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: helloworld.GetAllDriversHandler
+      CodeUri: target/get-all-drivers.jar
+      Events:
+        ApiGetAllDrivers:
+          Type: Api
+          Properties:
+            Path: /api/v1/drivers
+            Method: get
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref DriversTable
+
+  UpdateDriverFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: helloworld.UpdateDriverHandler
+      CodeUri: target/update-driver.jar
+      Events:
+        ApiUpdateDriver:
+          Type: Api
+          Properties:
+            Path: /api/v1/drivers/{id}
+            Method: put
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref DriversTable
+
+  DeleteDriverFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: helloworld.DeleteDriverHandler
+      CodeUri: target/delete-driver.jar
+      Events:
+        ApiDeleteDriver:
+          Type: Api
+          Properties:
+            Path: /api/v1/drivers/{id}
+            Method: delete
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref DriversTable
+
+  #########################################
+  # AUTH (LOGIN / REGISTER)
+  #########################################
+
+  RegisterManagerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: helloworld.RegisterManagerHandler
+      CodeUri: target/register-manager.jar
+      Events:
+        ApiRegister:
+          Type: Api
+          Properties:
+            Path: /auth/register
+            Method: post
+
+  LoginFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: helloworld.LoginHandler
+      CodeUri: target/login.jar
+      Events:
+        ApiLogin:
+          Type: Api
+          Properties:
+            Path: /auth/login
+            Method: post
+
+  #########################################
+  # ROUTES (CREAR SOLICITUD)
+  #########################################
+
+  CreateRouteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: helloworld.CreateRouteHandler
+      CodeUri: target/create-route.jar
+      Events:
+        ApiCreateRoute:
+          Type: Api
+          Properties:
+            Path: /api/v1/routes
+            Method: post
+      Environment:
+        Variables:
+          ROUTES_TABLE: !Ref RoutesTable

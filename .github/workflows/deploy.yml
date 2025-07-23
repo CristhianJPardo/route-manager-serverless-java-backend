@@ -1,0 +1,71 @@
+name: Deploy Java Lambda to AWS
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      S3_BUCKET:  ${{ secrets.S3_BUCKET }}
+      STACK_NAME: ${{ secrets.STACK_NAME }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      - name: Verify AWS CLI v2
+        run: aws --version
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Install SAM CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+          pip3 install aws-sam-cli
+
+      - name: Build with Maven (clean package + shade JAR)
+        run: mvn clean package
+
+      - name: Verify JAR contains handler class
+        run: |
+          echo "🔍 Verificando HelloWorldHandler.class en el JAR…"
+          jar tf target/hello-java-lambda-1.0-SNAPSHOT.jar \
+            | grep -q "helloworld/HelloWorldHandler.class" \
+            && echo "✅ Clase encontrada" \
+            || (echo "❌ Clase no encontrada en el JAR" && exit 1)
+
+      - name: Package with SAM
+        run: |
+          sam package \
+            --template-file sam-template.yaml \
+            --output-template-file packaged.yaml \
+            --s3-bucket ${{ env.S3_BUCKET }}
+
+      - name: Deploy with SAM
+        run: |
+          sam deploy \
+            --template-file packaged.yaml \
+            --stack-name ${{ env.STACK_NAME }} \
+            --capabilities CAPABILITY_IAM \
+            --region ${{ env.AWS_REGION }} \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset
