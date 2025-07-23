@@ -46,6 +46,9 @@ jobs:
       - name: Build health module
         run: mvn clean package -pl modules/health --also-make
 
+      - name: Build clients module
+        run: mvn package -pl modules/clients --also-make
+
       - name: Verify health JAR was generated
         run: |
           echo "📦 Contenido de modules/health/target/:"
