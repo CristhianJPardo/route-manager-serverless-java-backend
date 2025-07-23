@@ -32,18 +32,12 @@ Resources:
   ApiGateway:
     Type: AWS::Serverless::Api
     Properties:
+      Name: RouteManagerApi
       StageName: Prod
       Cors:
         AllowOrigin: "*"
-        AllowHeaders: 
-          - Content-Type
-          - Authorization
-        AllowMethods: 
-          - OPTIONS
-          - GET
-          - POST
-          - PUT
-          - DELETE
+        AllowHeaders: "Content-Type,Authorization"
+        AllowMethods: "OPTIONS,GET,POST,PUT,DELETE"
 
   #########################################
   # CLIENTS – CRUD en una sola Lambda
