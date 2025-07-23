@@ -1,4 +1,3 @@
-
 package co.lacorporacionun.drivers;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -7,37 +6,42 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.time.LocalDate;
 
 public class DriverService {
-
-    private static final String JDBC_URL;
-    private static final ObjectMapper mapper;
+    private static final String JDBC_URL_BASE;
+    private static final String DB_USER;
+    private static final String DB_PASSWORD;
+    private final ObjectMapper mapper;
 
     static {
-        String password = System.getenv("DB_PASSWORD");
-        JDBC_URL = String.format(
-            "jdbc:postgresql://aws-0-us-east-2.pooler.supabase.com:6543/postgres?user=postgres.rjfcrbysxgylfjtyluor&password=%s",
-            password
-        );
+        String host = System.getenv("DB_HOST");
+        String port = System.getenv("DB_PORT");
+        String db   = System.getenv("DB_NAME");
+        JDBC_URL_BASE = String.format("jdbc:postgresql://%s:%s/%s", host, port, db);
+        DB_USER = System.getenv("DB_USER");
+        DB_PASSWORD = System.getenv("DB_PASSWORD");
+        System.out.println("[DriverService] Initialized with base URL=" + JDBC_URL_BASE + " user=" + DB_USER);
+    }
 
+    public DriverService() {
         mapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-        System.out.println("[DriverService] Initialized with Supabase pooler");
     }
 
     private Connection getConnection() throws SQLException {
-        System.out.println("[DriverService] Opening DB connection via Supabase pooler");
+        System.out.println("[DriverService] Opening DB connection with SSL");
         Properties props = new Properties();
+        props.setProperty("user", DB_USER);
+        props.setProperty("password", DB_PASSWORD);
         props.setProperty("ssl", "true");
         props.setProperty("sslmode", "require");
-        return DriverManager.getConnection(JDBC_URL, props);
+        return DriverManager.getConnection(JDBC_URL_BASE, props);
     }
 
     public String listDrivers() {
@@ -47,7 +51,9 @@ public class DriverService {
              ResultSet rs = ps.executeQuery()) {
 
             List<Driver> list = new ArrayList<>();
-            while (rs.next()) list.add(mapRow(rs));
+            while (rs.next()) {
+                list.add(mapRow(rs));
+            }
             String json = mapper.writeValueAsString(list);
             System.out.println("[DriverService] Retrieved records=" + list.size());
             return json;
