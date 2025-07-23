@@ -74,4 +74,5 @@ jobs:
             --capabilities CAPABILITY_IAM \
             --region ${{ env.AWS_REGION }} \
             --no-confirm-changeset \
-            --no-fail-on-empty-changeset
+            --no-fail-on-empty-changeset \
+            --parameter-overrides DBPassword=${{ secrets.DB_PASSWORD }}

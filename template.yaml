@@ -4,35 +4,10 @@ Description: >
   Router Manager Backend con microservicios Lambda en Java y SupaBase
 
 Parameters:
-  SupabaseUrl:
-    Type: String
-    Description: URL de tu proyecto SupaBase
-  SupabaseApiKey:
-    Type: String
-    NoEcho: true
-    Description: API Key de SupaBase
-  DBHost:
-    Type: String
-    Description: Host de la base de datos
-  DBName:
-    Type: String
-    Default: postgres
-  DBUser:
-    Type: String
-    Default: postgres
   DBPassword:
     Type: String
     NoEcho: true
-
-  ClientsTable:
-    Type: String
-    Default: clients
-  DriversTable:
-    Type: String
-    Default: drivers
-  RoutesTable:
-    Type: String
-    Default: routes
+    Description: Contraseña de la base de datos (la inyectas desde CI)
 
 Globals:
   Function:
@@ -41,11 +16,13 @@ Globals:
     MemorySize: 512
     Environment:
       Variables:
-        SUPABASE_URL: !Ref SupabaseUrl
-        SUPABASE_API_KEY: !Ref SupabaseApiKey
-        DB_HOST: !Ref DBHost
-        DB_NAME: !Ref DBName
-        DB_USER: !Ref DBUser
+        SUPABASE_URL: ""
+        SUPABASE_API_KEY: ""
+        # Parámetros fijos en plantilla
+        DB_HOST: db.rjfcrbysxgylfjtyluor.supabase.co
+        DB_PORT: "5432"
+        DB_NAME: postgres
+        DB_USER: postgres
         DB_PASSWORD: !Ref DBPassword
 
 Resources:
