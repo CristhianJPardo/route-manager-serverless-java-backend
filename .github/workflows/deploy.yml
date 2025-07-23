@@ -49,6 +49,9 @@ jobs:
       - name: Build clients module
         run: mvn package -pl modules/clients --also-make
 
+      - name: Build drivers module
+        run: mvn package -pl modules/drivers --also-make
+
       - name: Package with SAM
         run: |
           sam package \
