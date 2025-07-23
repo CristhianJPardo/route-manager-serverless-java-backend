@@ -1,47 +1,55 @@
+// modules/clients/src/main/java/co/lacorporacionun/clients/ClientsHandler.java
 package co.lacorporacionun.clients;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.amazonaws.services.lambda.runtime.events.*;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 
 import java.util.Map;
 
-public class ClientsHandler
-    implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
-
+public class ClientsHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     private final ClientService service = new ClientService();
 
     @Override
-    public APIGatewayProxyResponseEvent handleRequest(
-            APIGatewayProxyRequestEvent req,
-            Context ctx) {
-
+    public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent req, Context ctx) {
+        var log = ctx.getLogger();
         String method = req.getHttpMethod();
-        Map<String,String> pathParams = req.getPathParameters();
+        String path = req.getPath();
+        Map<String, String> pathParams = req.getPathParameters();
 
+        log.log("[ClientsHandler] Received request: method=" + method + ", path=" + path);
         try {
+            APIGatewayProxyResponseEvent response;
             switch (method) {
                 case "GET":
                     if (pathParams != null && pathParams.containsKey("id")) {
-                        return buildResponse(200, service.getClientById(pathParams.get("id")));
+                        response = buildResponse(200, service.getClientById(pathParams.get("id")));
                     } else {
-                        return buildResponse(200, service.listClients());
+                        response = buildResponse(200, service.listClients());
                     }
+                    break;
                 case "POST":
-                    return buildResponse(201, service.createClient(req.getBody()));
+                    response = buildResponse(201, service.createClient(req.getBody()));
+                    break;
                 case "PUT":
-                    return buildResponse(200, service.updateClient(pathParams.get("id"), req.getBody()));
+                    response = buildResponse(200, service.updateClient(pathParams.get("id"), req.getBody()));
+                    break;
                 case "DELETE":
                     service.deleteClient(pathParams.get("id"));
-                    return new APIGatewayProxyResponseEvent().withStatusCode(204);
+                    response = new APIGatewayProxyResponseEvent().withStatusCode(204);
+                    break;
                 default:
-                    return new APIGatewayProxyResponseEvent()
-                        .withStatusCode(405)
-                        .withBody("{\"error\":\"Method Not Allowed\"}");
+                    response = new APIGatewayProxyResponseEvent().withStatusCode(405).withBody("{\"error\":\"Method Not Allowed\"}");
             }
+            log.log("[ClientsHandler] Responding with status=" + response.getStatusCode());
+            return response;
         } catch (Exception e) {
-            return new APIGatewayProxyResponseEvent()
-                .withStatusCode(500)
+            log.log("[ClientsHandler] Exception: " + e.getMessage());
+            for (var ste : e.getStackTrace()) {
+                log.log(ste.toString());
+            }
+            return new APIGatewayProxyResponseEvent().withStatusCode(500)
                 .withBody("{\"error\":\"" + e.getMessage() + "\"}");
         }
     }
@@ -49,7 +57,7 @@ public class ClientsHandler
     private APIGatewayProxyResponseEvent buildResponse(int code, String body) {
         return new APIGatewayProxyResponseEvent()
             .withStatusCode(code)
-            .withHeaders(Map.of("Content-Type","application/json"))
+            .withHeaders(Map.of("Content-Type", "application/json"))
             .withBody(body);
     }
 }
