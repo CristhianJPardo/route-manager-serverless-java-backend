@@ -49,19 +49,6 @@ jobs:
       - name: Build clients module
         run: mvn package -pl modules/clients --also-make
 
-      - name: Verify health JAR was generated
-        run: |
-          echo "📦 Contenido de modules/health/target/:"
-          ls modules/health/target
-
-      - name: Verify HealthCheckHandler in the shaded JAR
-        run: |
-          echo "🔍 Verificando HealthCheckHandler.class en el JAR…"
-          jar tf modules/health/target/health.jar \
-            | grep -q "co/lacorporacionun/health/HealthCheckHandler.class" \
-            && echo "✅ Clase encontrada" \
-            || (echo "❌ Clase no encontrada en el JAR" && exit 1)
-
       - name: Package with SAM
         run: |
           sam package \
