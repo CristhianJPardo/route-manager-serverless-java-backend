@@ -11,10 +11,12 @@ jobs:
     name: Build and Deploy
     runs-on: ubuntu-latest
 
+    # Cargamos aquí las repo-vars como env normales
     env:
-      AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-      S3_BUCKET:  ${{ secrets.S3_BUCKET }}
-      STACK_NAME: ${{ secrets.STACK_NAME }}
+      AWS_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+      S3_BUCKET:  ${{ vars.S3_BUCKET }}
+      SAM_TEMPLATE: ${{ vars.SAM_TEMPLATE }}
+      STACK_NAME: ${{ vars.STACK_NAME }}
 
     steps:
       - name: Checkout repo
@@ -56,7 +58,7 @@ jobs:
       - name: Package with SAM
         run: |
           sam package \
-            --template-file sam-template.yaml \
+            --template-file ${{ env.SAM_TEMPLATE }} \
             --output-template-file packaged.yaml \
             --s3-bucket ${{ env.S3_BUCKET }}
 
