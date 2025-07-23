@@ -26,6 +26,17 @@ Globals:
         DB_PASSWORD: !Ref DBPassword
 
 Resources:
+  #########################################
+  # API GATEWAY – Explicit Rest API
+  #########################################
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowOrigin: "*"
+        AllowHeaders: "Content-Type,Authorization"
+        AllowMethods: "OPTIONS,GET,POST,PUT,DELETE"
 
   #########################################
   # CLIENTS – CRUD en una sola Lambda
@@ -43,27 +54,32 @@ Resources:
           Type: Api
           Properties:
             Path: /api/v1/clients
-            Method: get
+            Method: get  
+            RestApiId: !Ref ApiGateway
         CreateClient:
           Type: Api
           Properties:
             Path: /api/v1/clients
             Method: post
+            RestApiId: !Ref ApiGateway
         GetClientById:
           Type: Api
           Properties:
             Path: /api/v1/clients/{id}
             Method: get
+            RestApiId: !Ref ApiGateway
         UpdateClientById:
           Type: Api
           Properties:
             Path: /api/v1/clients/{id}
             Method: put
+            RestApiId: !Ref ApiGateway
         DeleteClientById:
           Type: Api
           Properties:
             Path: /api/v1/clients/{id}
             Method: delete
+            RestApiId: !Ref ApiGateway
 
   #########################################
   # DRIVERS – CRUD en una sola Lambda
@@ -82,26 +98,31 @@ Resources:
           Properties:
             Path: /api/v1/drivers
             Method: get
+            RestApiId: !Ref ApiGateway
         CreateDriver:
           Type: Api
           Properties:
             Path: /api/v1/drivers
             Method: post
+            RestApiId: !Ref ApiGateway
         GetDriverById:
           Type: Api
           Properties:
             Path: /api/v1/drivers/{id}
             Method: get
+            RestApiId: !Ref ApiGateway
         UpdateDriverById:
           Type: Api
           Properties:
             Path: /api/v1/drivers/{id}
             Method: put
+            RestApiId: !Ref ApiGateway
         DeleteDriverById:
           Type: Api
           Properties:
             Path: /api/v1/drivers/{id}
             Method: delete
+            RestApiId: !Ref ApiGateway
 
   # #########################################
   # # ROUTES
@@ -135,11 +156,13 @@ Resources:
           Properties:
             Path: /ping
             Method: get
+            RestApiId: !Ref ApiGateway
         ApiDbPing:
           Type: Api
           Properties:
             Path: /health/db
             Method: get
+            RestApiId: !Ref ApiGateway
 Outputs:
   BaseApiUrl:
     Description: URL base de la API Gateway
