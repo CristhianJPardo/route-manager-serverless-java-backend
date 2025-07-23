@@ -1,4 +1,3 @@
-// modules/health/src/main/java/co/lacorporacionun/health/HealthCheckHandler.java
 package co.lacorporacionun.health;
 
 import com.amazonaws.services.lambda.runtime.Context;
@@ -36,28 +35,16 @@ public class HealthCheckHandler implements RequestHandler<APIGatewayProxyRequest
     }
 
     private APIGatewayProxyResponseEvent checkDatabase(Context ctx) throws Exception {
-        String host = System.getenv("DB_HOST");
-        String port = System.getenv("DB_PORT");
-        String db   = System.getenv("DB_NAME");
-        String user = System.getenv("DB_USER");
-        String pass = System.getenv("DB_PASSWORD");
-        String url;
-        if (host.startsWith("jdbc:")) {
-            // Si DB_HOST ya es una URL JDBC, le agregamos credenciales si no existen
-            url = host;
-            if (!host.contains("user=") && !host.contains("password=")) {
-                url = String.format("%s&user=%s&password=%s", host, user, pass);
-            }
-        } else {
-            // Construir la URL completa con SSL y credenciales
-            url = String.format(
-                "jdbc:postgresql://%s:%s/%s?sslmode=require&user=%s&password=%s",
-                host, port, db, user, pass
-            );
-        }
-        ctx.getLogger().log("[HealthCheckHandler] Checking DB with URL: " + url);
+        String password = System.getenv("DB_PASSWORD");
 
-        try (Connection conn = DriverManager.getConnection(url);
+        String jdbcUrl = String.format(
+            "jdbc:postgresql://aws-0-us-east-2.pooler.supabase.com:6543/postgres?user=postgres.rjfcrbysxgylfjtyluor&password=%s",
+            password
+        );
+
+        ctx.getLogger().log("[HealthCheckHandler] Checking DB using pooled URL.");
+
+        try (Connection conn = DriverManager.getConnection(jdbcUrl);
              Statement stmt = conn.createStatement()) {
             stmt.executeQuery("SELECT 1");
             return new APIGatewayProxyResponseEvent()
