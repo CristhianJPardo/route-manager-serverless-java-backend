@@ -200,7 +200,11 @@ Resources:
           Properties:
             Path: /ping
             Method: get
-
+        ApiDbPing:
+          Type: Api
+          Properties:
+            Path: /health/db
+            Method: get
 Outputs:
   BaseApiUrl:
     Description: URL base de la API Gateway
