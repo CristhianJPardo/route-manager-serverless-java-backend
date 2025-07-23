@@ -23,7 +23,8 @@ public class ClientService {
         String host = System.getenv("DB_HOST");
         String port = System.getenv("DB_PORT");
         String name = System.getenv("DB_NAME");
-        JDBC_URL = String.format("jdbc:postgresql://%s:%s/%s", host, port, name);
+        // AÑADIMOS sslmode=require para conectar con SupaBase
+        JDBC_URL = String.format("jdbc:postgresql://%s:%s/%s?sslmode=require", host, port, name);
         DB_USER = System.getenv("DB_USER");
         DB_PASSWORD = System.getenv("DB_PASSWORD");
         System.out.println("[ClientService] Initialized with URL=" + JDBC_URL + " and user=" + DB_USER);
