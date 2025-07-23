@@ -65,68 +65,43 @@ Resources:
             Path: /api/v1/clients/{id}
             Method: delete
 
-  # #########################################
-  # # DRIVERS
-  # #########################################
-  # CreateDriverFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     Handler: co.lacorporacionun.drivers.CreateDriverHandler
-  #     CodeUri: modules/drivers/target/drivers.jar
-  #     Events:
-  #       ApiCreateDriver:
-  #         Type: Api
-  #         Properties:
-  #           Path: /api/v1/drivers
-  #           Method: post
-  #     Environment:
-  #       Variables:
-  #         TABLE_NAME: !Ref DriversTable
-
-  # GetAllDriversFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     Handler: co.lacorporacionun.drivers.GetAllDriversHandler
-  #     CodeUri: modules/drivers/target/drivers.jar
-  #     Events:
-  #       ApiGetAllDrivers:
-  #         Type: Api
-  #         Properties:
-  #           Path: /api/v1/drivers
-  #           Method: get
-  #     Environment:
-  #       Variables:
-  #         TABLE_NAME: !Ref DriversTable
-
-  # UpdateDriverFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     Handler: co.lacorporacionun.drivers.UpdateDriverHandler
-  #     CodeUri: modules/drivers/target/drivers.jar
-  #     Events:
-  #       ApiUpdateDriver:
-  #         Type: Api
-  #         Properties:
-  #           Path: /api/v1/drivers/{id}
-  #           Method: put
-  #     Environment:
-  #       Variables:
-  #         TABLE_NAME: !Ref DriversTable
-
-  # DeleteDriverFunction:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     Handler: co.lacorporacionun.drivers.DeleteDriverHandler
-  #     CodeUri: modules/drivers/target/drivers.jar
-  #     Events:
-  #       ApiDeleteDriver:
-  #         Type: Api
-  #         Properties:
-  #           Path: /api/v1/drivers/{id}
-  #           Method: delete
-  #     Environment:
-  #       Variables:
-  #         TABLE_NAME: !Ref DriversTable
+  #########################################
+  # DRIVERS – CRUD en una sola Lambda
+  #########################################
+  DriversFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: co.lacorporacionun.drivers.DriversHandler
+      CodeUri: modules/drivers/target/drivers.jar
+      Environment:
+        Variables:
+          TABLE_NAME: drivers
+      Events:
+        ListDrivers:
+          Type: Api
+          Properties:
+            Path: /api/v1/drivers
+            Method: get
+        CreateDriver:
+          Type: Api
+          Properties:
+            Path: /api/v1/drivers
+            Method: post
+        GetDriverById:
+          Type: Api
+          Properties:
+            Path: /api/v1/drivers/{id}
+            Method: get
+        UpdateDriverById:
+          Type: Api
+          Properties:
+            Path: /api/v1/drivers/{id}
+            Method: put
+        DeleteDriverById:
+          Type: Api
+          Properties:
+            Path: /api/v1/drivers/{id}
+            Method: delete
 
   # #########################################
   # # ROUTES
