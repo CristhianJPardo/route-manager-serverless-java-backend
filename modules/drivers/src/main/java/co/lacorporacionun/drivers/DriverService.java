@@ -12,36 +12,28 @@ import java.util.Properties;
 import java.time.LocalDate;
 
 public class DriverService {
-    private static final String JDBC_URL_BASE;
-    private static final String DB_USER;
-    private static final String DB_PASSWORD;
-    private final ObjectMapper mapper;
+    private static final String JDBC_URL;
+    private static final ObjectMapper mapper;
 
     static {
-        String host = System.getenv("DB_HOST");
-        String port = System.getenv("DB_PORT");
-        String db   = System.getenv("DB_NAME");
-        JDBC_URL_BASE = String.format("jdbc:postgresql://%s:%s/%s", host, port, db);
-        DB_USER = System.getenv("DB_USER");
-        DB_PASSWORD = System.getenv("DB_PASSWORD");
-        System.out.println("[DriverService] Initialized with base URL=" + JDBC_URL_BASE + " user=" + DB_USER);
-    }
-
-    public DriverService() {
+        String password = System.getenv("DB_PASSWORD");
+        JDBC_URL = String.format(
+            "jdbc:postgresql://aws-0-us-east-2.pooler.supabase.com:6543/postgres?user=postgres.rjfcrbysxgylfjtyluor&password=%s",
+            password
+        );
         mapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        System.out.println("[DriverService] Initialized with Supabase pooler");
     }
 
     private Connection getConnection() throws SQLException {
-        System.out.println("[DriverService] Opening DB connection with SSL");
+        System.out.println("[DriverService] Opening DB connection via Supabase pooler");
         Properties props = new Properties();
-        props.setProperty("user", DB_USER);
-        props.setProperty("password", DB_PASSWORD);
         props.setProperty("ssl", "true");
         props.setProperty("sslmode", "require");
-        return DriverManager.getConnection(JDBC_URL_BASE, props);
+        return DriverManager.getConnection(JDBC_URL, props);
     }
 
     public String listDrivers() {
@@ -86,36 +78,36 @@ public class DriverService {
 
     public String createDriver(String body) {
         System.out.println("[DriverService] createDriver body=" + body);
-        try (Connection conn = getConnection()) {
-            Driver driver = mapper.readValue(body, Driver.class);
-            String sql = "INSERT INTO drivers (firstname, lastname, dni, username, license_category, license_expiration, address, whatsapp, phone, email, password, locality, neighborhood, latitude, longitude, role) " +
-                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *";
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setString(1, driver.getFirstname());
-                ps.setString(2, driver.getLastname());
-                ps.setString(3, driver.getDni());
-                ps.setString(4, driver.getUsername());
-                ps.setString(5, driver.getLicenseCategory());
-                ps.setDate(6, Date.valueOf(driver.getLicenseExpiration()));
-                ps.setString(7, driver.getAddress());
-                ps.setString(8, driver.getWhatsapp());
-                ps.setString(9, driver.getPhone());
-                ps.setString(10, driver.getEmail());
-                ps.setString(11, driver.getPassword());
-                ps.setString(12, driver.getLocality());
-                ps.setString(13, driver.getNeighborhood());
-                ps.setDouble(14, driver.getLatitude());
-                ps.setDouble(15, driver.getLongitude());
-                ps.setString(16, driver.getRole());
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(
+               "INSERT INTO drivers (firstname, lastname, dni, username, license_category, license_expiration, address, whatsapp, phone, email, password, locality, neighborhood, latitude, longitude, role) " +
+               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *")) {
 
-                ResultSet rs = ps.executeQuery();
-                if (rs.next()) {
-                    String json = mapper.writeValueAsString(mapRow(rs));
-                    System.out.println("[DriverService] Created driver id=" + rs.getInt("id"));
-                    return json;
-                }
-                throw new SQLException("Creation failed, no row returned");
+            Driver driver = mapper.readValue(body, Driver.class);
+            ps.setString(1, driver.getFirstname());
+            ps.setString(2, driver.getLastname());
+            ps.setString(3, driver.getDni());
+            ps.setString(4, driver.getUsername());
+            ps.setString(5, driver.getLicenseCategory());
+            ps.setDate(6, Date.valueOf(driver.getLicenseExpiration()));
+            ps.setString(7, driver.getAddress());
+            ps.setString(8, driver.getWhatsapp());
+            ps.setString(9, driver.getPhone());
+            ps.setString(10, driver.getEmail());
+            ps.setString(11, driver.getPassword());
+            ps.setString(12, driver.getLocality());
+            ps.setString(13, driver.getNeighborhood());
+            ps.setDouble(14, driver.getLatitude());
+            ps.setDouble(15, driver.getLongitude());
+            ps.setString(16, driver.getRole());
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String json = mapper.writeValueAsString(mapRow(rs));
+                System.out.println("[DriverService] Created driver id=" + rs.getInt("id"));
+                return json;
             }
+            throw new SQLException("Creation failed, no row returned");
         } catch (Exception e) {
             System.err.println("[DriverService] createDriver error: " + e);
             throw new RuntimeException(e);
@@ -124,36 +116,36 @@ public class DriverService {
 
     public String updateDriver(String id, String body) {
         System.out.println("[DriverService] updateDriver id=" + id + " body=" + body);
-        try (Connection conn = getConnection()) {
-            Driver driver = mapper.readValue(body, Driver.class);
-            String sql = "UPDATE drivers SET firstname=?, lastname=?, dni=?, username=?, license_category=?, license_expiration=?, address=?, whatsapp=?, phone=?, email=?, password=?, locality=?, neighborhood=?, latitude=?, longitude=?, role=? WHERE id=? RETURNING *";
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setString(1, driver.getFirstname());
-                ps.setString(2, driver.getLastname());
-                ps.setString(3, driver.getDni());
-                ps.setString(4, driver.getUsername());
-                ps.setString(5, driver.getLicenseCategory());
-                ps.setDate(6, Date.valueOf(driver.getLicenseExpiration()));
-                ps.setString(7, driver.getAddress());
-                ps.setString(8, driver.getWhatsapp());
-                ps.setString(9, driver.getPhone());
-                ps.setString(10, driver.getEmail());
-                ps.setString(11, driver.getPassword());
-                ps.setString(12, driver.getLocality());
-                ps.setString(13, driver.getNeighborhood());
-                ps.setDouble(14, driver.getLatitude());
-                ps.setDouble(15, driver.getLongitude());
-                ps.setString(16, driver.getRole());
-                ps.setInt(17, Integer.parseInt(id));
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(
+               "UPDATE drivers SET firstname=?, lastname=?, dni=?, username=?, license_category=?, license_expiration=?, address=?, whatsapp=?, phone=?, email=?, password=?, locality=?, neighborhood=?, latitude=?, longitude=?, role=? WHERE id=? RETURNING *")) {
 
-                ResultSet rs = ps.executeQuery();
-                if (rs.next()) {
-                    String json = mapper.writeValueAsString(mapRow(rs));
-                    System.out.println("[DriverService] Updated driver id=" + id);
-                    return json;
-                }
-                return "{}";
+            Driver driver = mapper.readValue(body, Driver.class);
+            ps.setString(1, driver.getFirstname());
+            ps.setString(2, driver.getLastname());
+            ps.setString(3, driver.getDni());
+            ps.setString(4, driver.getUsername());
+            ps.setString(5, driver.getLicenseCategory());
+            ps.setDate(6, Date.valueOf(driver.getLicenseExpiration()));
+            ps.setString(7, driver.getAddress());
+            ps.setString(8, driver.getWhatsapp());
+            ps.setString(9, driver.getPhone());
+            ps.setString(10, driver.getEmail());
+            ps.setString(11, driver.getPassword());
+            ps.setString(12, driver.getLocality());
+            ps.setString(13, driver.getNeighborhood());
+            ps.setDouble(14, driver.getLatitude());
+            ps.setDouble(15, driver.getLongitude());
+            ps.setString(16, driver.getRole());
+            ps.setInt(17, Integer.parseInt(id));
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String json = mapper.writeValueAsString(mapRow(rs));
+                System.out.println("[DriverService] Updated driver id=" + id);
+                return json;
             }
+            return "{}";
         } catch (Exception e) {
             System.err.println("[DriverService] updateDriver error: " + e);
             throw new RuntimeException(e);
@@ -164,6 +156,7 @@ public class DriverService {
         System.out.println("[DriverService] deleteDriver id=" + id);
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement("DELETE FROM drivers WHERE id=?")) {
+
             ps.setInt(1, Integer.parseInt(id));
             int rows = ps.executeUpdate();
             System.out.println("[DriverService] deleteDriver affectedRows=" + rows);
