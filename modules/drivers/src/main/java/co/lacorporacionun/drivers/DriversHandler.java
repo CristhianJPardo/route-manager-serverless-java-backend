@@ -13,21 +13,29 @@ public class DriversHandler implements RequestHandler<APIGatewayProxyRequestEven
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent req, Context ctx) {
         String method = req.getHttpMethod();
         String path = req.getPath();
-        String id = req.getPathParameters() != null ? req.getPathParameters().get("id") : null;
+        String id = null;
+        if (req.getPathParameters() != null) {
+            id = req.getPathParameters().get("id");
+        }
 
         try {
-            return switch (method) {
-                case "GET" -> (id != null) ?
-                        response(200, service.getDriverById(id)) :
-                        response(200, service.listDrivers());
-                case "POST" -> response(201, service.createDriver(req.getBody()));
-                case "PUT" -> response(200, service.updateDriver(id, req.getBody()));
-                case "DELETE" -> {
+            switch (method) {
+                case "GET":
+                    if (id != null) {
+                        return response(200, service.getDriverById(id));
+                    } else {
+                        return response(200, service.listDrivers());
+                    }
+                case "POST":
+                    return response(201, service.createDriver(req.getBody()));
+                case "PUT":
+                    return response(200, service.updateDriver(id, req.getBody()));
+                case "DELETE":
                     service.deleteDriver(id);
-                    yield response(204, "");
-                }
-                default -> response(405, "Method Not Allowed");
-            };
+                    return response(204, "");
+                default:
+                    return response(405, "Method Not Allowed");
+            }
         } catch (Exception e) {
             ctx.getLogger().log("[DriversHandler] Error: " + e);
             return response(500, "ERROR: " + e.getMessage());
@@ -35,6 +43,8 @@ public class DriversHandler implements RequestHandler<APIGatewayProxyRequestEven
     }
 
     private APIGatewayProxyResponseEvent response(int status, String body) {
-        return new APIGatewayProxyResponseEvent().withStatusCode(status).withBody(body);
+        return new APIGatewayProxyResponseEvent()
+            .withStatusCode(status)
+            .withBody(body);
     }
 }
