@@ -1,4 +1,3 @@
-// modules/clients/src/main/java/co/lacorporacionun/clients/ClientService.java
 package co.lacorporacionun.clients;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -7,43 +6,36 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.sql.*;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 public class ClientService {
-    private static final String JDBC_URL_BASE;
-    private static final String DB_USER;
-    private static final String DB_PASSWORD;
-    private final ObjectMapper mapper;
+
+    private static final String JDBC_URL;
+    private static final ObjectMapper mapper;
 
     static {
-        String host = System.getenv("DB_HOST");
-        String port = System.getenv("DB_PORT");
-        String name = System.getenv("DB_NAME");
-        JDBC_URL_BASE = String.format("jdbc:postgresql://%s:%s/%s", host, port, name);
-        DB_USER = System.getenv("DB_USER");
-        DB_PASSWORD = System.getenv("DB_PASSWORD");
-        System.out.println("[ClientService] Initialized with base URL=" + JDBC_URL_BASE + " user=" + DB_USER);
-    }
+        String password = System.getenv("DB_PASSWORD");
+        JDBC_URL = String.format(
+            "jdbc:postgresql://aws-0-us-east-2.pooler.supabase.com:6543/postgres?user=postgres.rjfcrbysxgylfjtyluor&password=%s",
+            password
+        );
 
-    public ClientService() {
         mapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        System.out.println("[ClientService] Initialized with Supabase pooler");
     }
 
     private Connection getConnection() throws SQLException {
-        System.out.println("[ClientService] Opening DB connection with SSL");
+        System.out.println("[ClientService] Opening DB connection via Supabase pooler");
         Properties props = new Properties();
-        props.setProperty("user", DB_USER);
-        props.setProperty("password", DB_PASSWORD);
         props.setProperty("ssl", "true");
         props.setProperty("sslmode", "require");
-        return DriverManager.getConnection(JDBC_URL_BASE, props);
+        return DriverManager.getConnection(JDBC_URL, props);
     }
 
     public String listClients() {
@@ -51,6 +43,7 @@ public class ClientService {
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement("SELECT * FROM clients");
              ResultSet rs = ps.executeQuery()) {
+
             List<Client> list = new ArrayList<>();
             while (rs.next()) list.add(mapRow(rs));
             String json = mapper.writeValueAsString(list);
@@ -66,6 +59,7 @@ public class ClientService {
         System.out.println("[ClientService] getClientById id=" + id);
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement("SELECT * FROM clients WHERE id=?")) {
+
             ps.setInt(1, Integer.parseInt(id));
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
