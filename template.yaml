@@ -40,6 +40,43 @@ Resources:
         AllowMethods: "OPTIONS,GET,POST,PUT,DELETE"
 
   #########################################
+  # AUTH – Login & Register
+  #########################################
+  AuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: co.lacorporacionun.auth.AuthHandler
+      CodeUri: modules/auth/target/auth.jar
+      Environment:
+        Variables:
+          DB_HOST: !Ref DBHost
+          DB_PORT: !Ref DBPort
+          DB_NAME: !Ref DBName
+          DB_USER: !Ref DBUser
+          DB_PASSWORD: !Ref DBPassword
+          JWT_SECRET: "1234"
+      Events:
+        RegisterUser:
+          Type: Api
+          Properties:
+            Path: /api/v1/auth/register
+            Method: post
+            RestApiId: !Ref ApiGateway
+        LoginUser:
+          Type: Api
+          Properties:
+            Path: /api/v1/auth/login
+            Method: post
+            RestApiId: !Ref ApiGateway
+        AuthOptions:
+          Type: Api
+          Properties:
+            Path: /api/v1/auth/{proxy+}
+            Method: options
+            RestApiId: !Ref ApiGateway
+
+
+  #########################################
   # CLIENTS – CRUD en una sola Lambda
   #########################################
   ClientsFunction:
