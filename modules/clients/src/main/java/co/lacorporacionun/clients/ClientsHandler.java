@@ -1,4 +1,3 @@
-// modules/clients/src/main/java/co/lacorporacionun/clients/ClientsHandler.java
 package co.lacorporacionun.clients;
 
 import com.amazonaws.services.lambda.runtime.Context;
@@ -37,11 +36,20 @@ public class ClientsHandler implements RequestHandler<APIGatewayProxyRequestEven
                     break;
                 case "DELETE":
                     service.deleteClient(pathParams.get("id"));
-                    response = new APIGatewayProxyResponseEvent().withStatusCode(204);
+                    response = new APIGatewayProxyResponseEvent()
+                            .withStatusCode(204)
+                            .withHeaders(corsHeaders());
+                    break;
+                case "OPTIONS":
+                    response = new APIGatewayProxyResponseEvent()
+                            .withStatusCode(200)
+                            .withHeaders(corsHeaders());
                     break;
                 default:
-                    response = new APIGatewayProxyResponseEvent().withStatusCode(405)
-                        .withBody("{\"error\":\"Method Not Allowed\"}");
+                    response = new APIGatewayProxyResponseEvent()
+                            .withStatusCode(405)
+                            .withHeaders(corsHeaders())
+                            .withBody("{\"error\":\"Method Not Allowed\"}");
             }
             log.log("[ClientsHandler] Responding status=" + response.getStatusCode());
             return response;
@@ -49,15 +57,25 @@ public class ClientsHandler implements RequestHandler<APIGatewayProxyRequestEven
             log.log("[ClientsHandler] Exception: " + e);
             for (var ste : e.getStackTrace()) log.log(ste.toString());
             return new APIGatewayProxyResponseEvent()
-                .withStatusCode(500)
-                .withBody("{\"error\":\"" + e.getMessage() +"\"}");
+                    .withStatusCode(500)
+                    .withHeaders(corsHeaders())
+                    .withBody("{\"error\":\"" + e.getMessage() + "\"}");
         }
     }
 
     private APIGatewayProxyResponseEvent buildResponse(int code, String body) {
         return new APIGatewayProxyResponseEvent()
-            .withStatusCode(code)
-            .withHeaders(Map.of("Content-Type","application/json"))
-            .withBody(body);
+                .withStatusCode(code)
+                .withHeaders(corsHeaders())
+                .withBody(body);
+    }
+
+    private Map<String, String> corsHeaders() {
+        return Map.of(
+                "Access-Control-Allow-Origin", "*",
+                "Access-Control-Allow-Methods", "OPTIONS,GET,POST,PUT,DELETE",
+                "Access-Control-Allow-Headers", "Content-Type,Authorization",
+                "Content-Type", "application/json"
+        );
     }
 }

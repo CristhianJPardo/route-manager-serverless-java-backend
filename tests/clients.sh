@@ -20,3 +20,9 @@ curl -X DELETE https://cfq1m4xlsb.execute-api.us-east-1.amazonaws.com/Prod/api/v
 # 6) Probar simulando un navegador
 curl -X GET https://cfq1m4xlsb.execute-api.us-east-1.amazonaws.com/Prod/api/v1/clients \
   -H "Origin: https://mi-frontend.com"
+
+# 7) Probar desde la terminal de un navegador para verificar cors
+fetch("https://cfq1m4xlsb.execute-api.us-east-1.amazonaws.com/Prod/api/v1/clients")
+  .then(r => r.json())
+  .then(console.log)
+  .catch(console.error);
