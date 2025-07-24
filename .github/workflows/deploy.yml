@@ -52,6 +52,9 @@ jobs:
       - name: Build drivers module
         run: mvn package -pl modules/drivers --also-make
 
+      - name: Build auth module
+        run: mvn package -pl modules/auth --also-make
+
       - name: Package with SAM
         run: |
           sam package \
