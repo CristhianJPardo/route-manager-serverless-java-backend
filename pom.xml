@@ -13,6 +13,7 @@
     <module>modules/health</module>
     <module>modules/clients</module>
     <module>modules/drivers</module>
+    <module>modules/auth</module>
     <!-- más módulos en el futuro: clients, drivers, routes -->
   </modules>
 
