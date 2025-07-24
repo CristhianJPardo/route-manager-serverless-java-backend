@@ -51,30 +51,35 @@ Resources:
         Variables:
           TABLE_NAME: clients
       Events:
+
         ListClients:
           Type: Api
           Properties:
             Path: /api/v1/clients
             Method: get  
             RestApiId: !Ref ApiGateway
+
         CreateClient:
           Type: Api
           Properties:
             Path: /api/v1/clients
             Method: post
             RestApiId: !Ref ApiGateway
+
         GetClientById:
           Type: Api
           Properties:
             Path: /api/v1/clients/{id}
             Method: get
             RestApiId: !Ref ApiGateway
+
         UpdateClientById:
           Type: Api
           Properties:
             Path: /api/v1/clients/{id}
             Method: put
             RestApiId: !Ref ApiGateway
+
         DeleteClientById:
           Type: Api
           Properties:
@@ -82,6 +87,20 @@ Resources:
             Method: delete
             RestApiId: !Ref ApiGateway
 
+        # Se agrega soporte explícito para OPTIONS (CORS) en las rutas
+        OptionsClients:
+          Type: Api
+          Properties:
+            Path: /api/v1/clients
+            Method: options
+            RestApiId: !Ref ApiGateway
+
+        OptionsClientById:
+          Type: Api
+          Properties:
+            Path: /api/v1/clients/{id}
+            Method: options
+            RestApiId: !Ref ApiGateway
   #########################################
   # DRIVERS – CRUD en una sola Lambda
   #########################################
@@ -100,30 +119,50 @@ Resources:
             Path: /api/v1/drivers
             Method: get
             RestApiId: !Ref ApiGateway
+
         CreateDriver:
           Type: Api
           Properties:
             Path: /api/v1/drivers
             Method: post
             RestApiId: !Ref ApiGateway
+
         GetDriverById:
           Type: Api
           Properties:
             Path: /api/v1/drivers/{id}
             Method: get
             RestApiId: !Ref ApiGateway
+
         UpdateDriverById:
           Type: Api
           Properties:
             Path: /api/v1/drivers/{id}
             Method: put
             RestApiId: !Ref ApiGateway
+
         DeleteDriverById:
           Type: Api
           Properties:
             Path: /api/v1/drivers/{id}
             Method: delete
             RestApiId: !Ref ApiGateway
+
+        # 🔽 Nuevos eventos para habilitar CORS explícitamente
+        OptionsDrivers:
+          Type: Api
+          Properties:
+            Path: /api/v1/drivers
+            Method: options
+            RestApiId: !Ref ApiGateway
+
+        OptionsDriverById:
+          Type: Api
+          Properties:
+            Path: /api/v1/drivers/{id}
+            Method: options
+            RestApiId: !Ref ApiGateway
+
 
   # #########################################
   # # ROUTES
@@ -158,12 +197,29 @@ Resources:
             Path: /ping
             Method: get
             RestApiId: !Ref ApiGateway
+
         ApiDbPing:
           Type: Api
           Properties:
             Path: /health/db
             Method: get
             RestApiId: !Ref ApiGateway
+
+        # 🔽 Nuevos eventos OPTIONS para CORS
+        OptionsPing:
+          Type: Api
+          Properties:
+            Path: /ping
+            Method: options
+            RestApiId: !Ref ApiGateway
+
+        OptionsDbPing:
+          Type: Api
+          Properties:
+            Path: /health/db
+            Method: options
+            RestApiId: !Ref ApiGateway
+
 Outputs:
   BaseApiUrl:
     Description: "API Gateway endpoint URL"
